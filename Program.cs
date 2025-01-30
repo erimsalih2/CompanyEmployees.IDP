@@ -1,4 +1,6 @@
 ﻿using CompanyEmployees.IDP;
+using CompanyEmployees.IDP.Entities.Configuration;
+using CompanyEmployees.IDP.InitialSeed;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration()
@@ -19,11 +21,21 @@ try
     var app = builder
         .ConfigureServices()
         .ConfigurePipeline();
-    
-    app.Run();
+    app.MigrateDatabase().Run();
+    var config = app.Services.GetRequiredService<IConfiguration>();
+    var connectionString = config.GetConnectionString("identitySqlConnection");
+    SeedUserData.EnsureSeedData(connectionString);
+
 }
 catch (Exception ex)
 {
+    if (ex.GetType().Name != "HostAbortedException")
+    {
+        Log.Fatal(ex, $"Unhandled exception {ex.GetType().Name}");
+    }
+
+    
+
     Log.Fatal(ex, "Unhandled exception");
 }
 finally
