@@ -21,4 +21,12 @@
 
 		<PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
 	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\Desktop\Materials-NET8\Bonus 6 - Mastering ASP.NET Core Security\12-Reset Password\EmailService\EmailService.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Pages\NewFolder\" />
+	</ItemGroup>
 </Project>

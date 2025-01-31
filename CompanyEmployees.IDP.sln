@@ -5,6 +5,8 @@ VisualStudioVersion = 17.12.35527.113
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CompanyEmployees.IDP", "CompanyEmployees.IDP.csproj", "{29086624-6FC1-4EFA-ABD4-BB96492B2452}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmailService", "..\Desktop\Materials-NET8\Bonus 6 - Mastering ASP.NET Core Security\12-Reset Password\EmailService\EmailService.csproj", "{5DBC62AD-404D-47DD-AA68-C66EDCC63D55}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{29086624-6FC1-4EFA-ABD4-BB96492B2452}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{29086624-6FC1-4EFA-ABD4-BB96492B2452}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{29086624-6FC1-4EFA-ABD4-BB96492B2452}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5DBC62AD-404D-47DD-AA68-C66EDCC63D55}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5DBC62AD-404D-47DD-AA68-C66EDCC63D55}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5DBC62AD-404D-47DD-AA68-C66EDCC63D55}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5DBC62AD-404D-47DD-AA68-C66EDCC63D55}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

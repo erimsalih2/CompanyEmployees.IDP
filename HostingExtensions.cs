@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using CompanyEmployees.IDP.Entities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Identity;
+using EmailService;
+using CompanyEmployees.IDP.CustomTokenProviders;
 
 namespace CompanyEmployees.IDP;
 
@@ -14,6 +16,11 @@ internal static class HostingExtensions
         // uncomment if you want to add a UI
         builder.Services.AddRazorPages();
         builder.Services.AddAutoMapper(typeof(Program));
+        var emailConfig = builder.Configuration
+        .GetSection("EmailConfiguration")
+        .Get<EmailConfiguration>();
+        builder.Services.AddSingleton(emailConfig);
+        builder.Services.AddScoped<IEmailSender, EmailSender>();
         var migrationAssembly = typeof(Program).GetTypeInfo().Assembly.GetName().Name;
         builder.Services.AddDbContext<UserContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("identityPostgreConnection")));
         builder.Services.AddIdentity<User, IdentityRole>(opt =>
@@ -21,9 +28,13 @@ internal static class HostingExtensions
             opt.Password.RequireDigit = false;
             opt.Password.RequiredLength = 7;
             opt.Password.RequireUppercase = false;
+            opt.User.RequireUniqueEmail = true;
+            opt.SignIn.RequireConfirmedEmail = true;
+            opt.Tokens.EmailConfirmationTokenProvider = "emailconfirmation";
         })
         .AddEntityFrameworkStores<UserContext>()
-        .AddDefaultTokenProviders();
+        .AddDefaultTokenProviders()
+        .AddTokenProvider<EmailConfirmationTokenProvider<User>>("emailconfirmation"); 
         builder.Services.AddIdentityServer(options =>
             {
                 
@@ -44,7 +55,11 @@ internal static class HostingExtensions
              }).AddAspNetIdentity<User>();
 
 
+        builder.Services.Configure<DataProtectionTokenProviderOptions>(opt =>
+         opt.TokenLifespan = TimeSpan.FromHours(2));
 
+        builder.Services.Configure<EmailConfirmationTokenProviderOptions>(opt =>
+         opt.TokenLifespan = TimeSpan.FromDays(3));
 
 
         return builder.Build();
