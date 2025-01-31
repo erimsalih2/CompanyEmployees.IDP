@@ -2,12 +2,14 @@
 // See LICENSE in the project root for license information.
 
 using CompanyEmployees.IDP.Entities;
+using CompanyEmployees.IDP.Pages.Account;
 using Duende.IdentityServer;
 using Duende.IdentityServer.Events;
 using Duende.IdentityServer.Models;
 using Duende.IdentityServer.Services;
 using Duende.IdentityServer.Stores;
 using Duende.IdentityServer.Test;
+using EmailService;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -19,7 +21,7 @@ namespace CompanyEmployees.IDP.Pages.Login;
 
 [SecurityHeaders]
 [AllowAnonymous]
-public class Index : PageModel
+public class Index : BasePage
 {
     private readonly TestUserStore _users;
     private readonly IIdentityServerInteractionService _interaction;
@@ -28,6 +30,7 @@ public class Index : PageModel
     private readonly IIdentityProviderStore _identityProviderStore;
     private readonly UserManager<User> _userManager;
     private readonly SignInManager<User> _signInManager;
+    private readonly IEmailSender _emailSender;
     public ViewModel View { get; set; } = default!;
 
     [BindProperty]
@@ -38,7 +41,7 @@ public class Index : PageModel
         IAuthenticationSchemeProvider schemeProvider,
         IIdentityProviderStore identityProviderStore,
         IEventService events,
-        UserManager<User> userManager, SignInManager<User> signInManager)
+        UserManager<User> userManager, SignInManager<User> signInManager, IEmailSender emailSender) : base(userManager, emailSender)
     {
         // this is where you would plug in your own custom identity management library (e.g. ASP.NET Identity)
         _userManager = userManager;
@@ -47,6 +50,8 @@ public class Index : PageModel
         _schemeProvider = schemeProvider;
         _identityProviderStore = identityProviderStore;
         _events = events;
+        _emailSender = emailSender;
+
     }
 
     public async Task<IActionResult> OnGet(string? returnUrl)
@@ -130,16 +135,28 @@ public class Index : PageModel
                     throw new Exception("invalid return URL");
                 }
             }
+            if (result.IsLockedOut)
+            {
+                await HandleLockout(Input.Username, Input.ReturnUrl);
+            }            if (result.RequiresTwoFactor)
+            {
+                return RedirectToPage("/Account/Login/LoginTwoStep",
+                new { Email = Input.Username, Input.RememberLogin, Input.ReturnUrl });
+            }            else
+            {
+
+
             await _events.RaiseAsync(new UserLoginFailureEvent(Input.Username, "invalid credentials", clientId:context?.Client.ClientId));
            
             ModelState.AddModelError(string.Empty,
            LoginOptions.InvalidLoginAttempt);
-        }
+            }        }
 
         // something went wrong, show form with error
         await BuildModelAsync(Input.ReturnUrl);
         return Page();
     }
+    
 
     private async Task BuildModelAsync(string? returnUrl)
     {
@@ -206,5 +223,6 @@ public class Index : PageModel
             EnableLocalLogin = allowLocal && LoginOptions.AllowLocalLogin,
             ExternalProviders = providers.ToArray()
         };
+
     }
 }

@@ -48,6 +48,12 @@ namespace CompanyEmployees.IDP.Pages.Account.ResetPassword
                 }
                 return Page();
             }
+            if (await _userManager.IsLockedOutAsync(user))
+            {
+                await _userManager.SetLockoutEndDateAsync(user, new DateTimeOffset(new
+               DateTime(1000, 1, 1, 1, 1, 1)));
+            }
+
             return RedirectToPage("/Account/ResetPassword/ResetPasswordConfirmation", new
             {
                 ReturnUrl

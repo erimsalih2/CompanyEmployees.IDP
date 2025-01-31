@@ -31,6 +31,9 @@ internal static class HostingExtensions
             opt.User.RequireUniqueEmail = true;
             opt.SignIn.RequireConfirmedEmail = true;
             opt.Tokens.EmailConfirmationTokenProvider = "emailconfirmation";
+            opt.Lockout.AllowedForNewUsers = true;
+            opt.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(2);
+            opt.Lockout.MaxFailedAccessAttempts = 3;
         })
         .AddEntityFrameworkStores<UserContext>()
         .AddDefaultTokenProviders()
@@ -60,7 +63,14 @@ internal static class HostingExtensions
 
         builder.Services.Configure<EmailConfirmationTokenProviderOptions>(opt =>
          opt.TokenLifespan = TimeSpan.FromDays(3));
+        builder.Services.AddAuthentication()
+         .AddGoogle(options =>
+         {
+             options.ClientId = "591322315213-vam44q9c3l7vmeajqco8nlabrv99r8li.apps.googleusercontent.com";
+             options.ClientSecret = "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";
 
+             
+         });
 
         return builder.Build();
     }
